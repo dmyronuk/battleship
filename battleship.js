@@ -8,15 +8,36 @@ class Ship {
     this.name = name;
     this.length = length;
     this.hits = [];
-    for(let i = 0; i < length; i++){
-      hits.push(0);
+    this.isOperational = true;
+    for(let j = 0; j < length; j++){
+      this.hits.push(0);
+    }
+  }
+
+  checkIfSunk(){
+    var isSunk = this.hits.reduce((a, b) => !a && b === 0);
+    if(isSunk){
+      this.isOperational = false;
     }
   }
 };
 
 class Player {
-  constructor(id){
-    this.id = id;
+  constructor(num){
+    this.playerId = num;
+    this.ships = this.initShips();
+  }
+
+  initShips(){
+    let ships = {}
+    for(let i = 1; i < 3; i++){
+      ships.carrier = new Ship("Carrier", 5);
+      ships.battleship = new Ship("Battleship", 4);
+      ships.cruiser = new Ship("Cruiser", 3);
+      ships.submarine = new Ship("Submarine", 3);
+      ships.destroyer = new Ship("Destroyer", 2);
+    }
+    return ships;
   }
 };
 
@@ -40,10 +61,10 @@ class Game {
   }
 
   initPlayers(){
-    let players = []
+    let players = {}
     for(let i = 1; i < 3; i++){
       let curPlayer = new Player(i);
-      players.push(curPlayer);
+      players[`p${i}`] = curPlayer;
     }
     return players;
   }
@@ -59,7 +80,7 @@ let createSquare = (parentRow, xVal, yVal) => {
   parentRow.append(square);
 }
 
-let createBoardRow = (boardWidth, boardHeight) => {
+let createBoard = (boardWidth, boardHeight) => {
   let container = $("#game-container");
 
   for(let i = 0; i < 10; i++){
@@ -75,6 +96,19 @@ let createBoardRow = (boardWidth, boardHeight) => {
   }
 };
 
-createBoardRow(options.boardWidth, options.boardHeight);
+createBoard(options.boardWidth, options.boardHeight);
 
-var curGame = new Game()
+/*
+  We have a 10 x 10 board array:
+    -each square on the board is either going to contain:
+      -null if it's empty
+    -an object if it's occupied
+      -object:
+        object.playerNum
+        object.name ie cruiser
+        object.index ie 3rd position
+        -hit info is going to be store in a separate ships object, along with the ship name, maybe an image,
+
+*/
+
+var curGame = new Game();
