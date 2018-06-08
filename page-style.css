@@ -69,11 +69,22 @@ a:hover{
   color:#aaaaaa;
 }
 
-#game-container{
-  width:500px;
-  height:500px;
-  margin:auto;
+.flex-container{
+  display:flex;
+  flex-direction:row;
+  justify-content:space-evenly;
+}
+
+.board-container{
   background:lightblue;
+}
+
+#cur-player-board-container{
+
+}
+
+#opponent-board-container{
+
 }
 
 .sub-container{

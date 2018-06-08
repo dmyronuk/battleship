@@ -1,6 +1,6 @@
 let options = {
-  boardWidth: 500,
-  boardHeight: 500
+  boardWidth: 400,
+  boardHeight: 400
 }
 
 class Ship {
@@ -70,33 +70,45 @@ class Game {
   }
 };
 
-let createSquare = (parentRow, xVal, yVal) => {
+let calculateSquareColor = (rowNum, colNum) => {
+  let remainder = (rowNum % 2 === 0) ? 1 : 0;
+  let color = (colNum % 2 === remainder) ? "blue" : "#e5e5ff";
+  return color;
+}
+
+let createSquare = (parentRow, ownerStr, squareColor, rowChar, j) => {
   let square = $("<div/>").addClass("board-square");
   let squareWidth = options.boardWidth / 10;
+  square.css("background-color", squareColor);
   square.css("width", squareWidth);
-  square.attr("id", `square-${xVal}-${yVal}`);
-  square.attr("xVal", xVal);
-  square.attr("yVal", yVal);
+  square.attr("id", `${ownerStr}-${rowChar}${j}`);
   parentRow.append(square);
 }
 
-let createBoard = (boardWidth, boardHeight) => {
-  let container = $("#game-container");
+let createBoards = (options, elems) => {
+  for(elem of elems){
+    let container = $("#" + elem);
+    let ownerStr = container.attr("owner");
 
-  for(let i = 0; i < 10; i++){
-    let row = $("<div/>").addClass("board-row");
-    row.css("width", boardWidth);
-    row.css("height", boardHeight / 10);
-    row.attr("id", "row-" + i);
-    row.attr("yVal", i);
-    for(let j = 0; j < 10; j++){
-      createSquare(row, j, i);
+    //rows
+    for(let i = 0; i < 10; i++){
+      var rowChar = String.fromCharCode(i + 65);
+      let row = $("<div/>").addClass("board-row");
+      row.css("width", options.boardWidth);
+      row.css("height", options.boardHeight / 10);
+      row.attr("id", "row-" + rowChar);
+
+      //each row entry
+      for(let j = 1; j < 11; j++){
+        let squareColor = calculateSquareColor(i, j);
+        createSquare(row, ownerStr, squareColor, rowChar, j);
+      }
+      container.append(row);
     }
-    container.append(row);
   }
 };
 
-createBoard(options.boardWidth, options.boardHeight);
+createBoards(options, ["hero-board-container", "opponent-board-container"]);
 
 /*
   We have a 10 x 10 board array:

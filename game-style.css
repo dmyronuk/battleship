@@ -1,12 +1,9 @@
 .board-row{
   display:block;
-  outline: 1px solid black;
-  background:red;
 }
 
 .board-square{
   outline: 1px solid black;
   display:inline-block;
   height:100%;
-  background:blue;
 }
