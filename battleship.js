@@ -82,6 +82,8 @@ let createSquare = (parentRow, ownerStr, squareColor, rowChar, j) => {
   square.css("background-color", squareColor);
   square.css("width", squareWidth);
   square.attr("id", `${ownerStr}-${rowChar}${j}`);
+  //Need to pull the DOM element out of the jquery object
+  square[0].addEventListener("click", squareClickHandler);
   parentRow.append(square);
 }
 
@@ -108,7 +110,42 @@ let createBoards = (options, elems) => {
   }
 };
 
+let squareClickHandler = (event) => {
+  console.log(event.target.id);
+}
+
+let labelBoards = () => {
+  let boards = Array.from($(".game-container"));
+  boards.forEach((board) => {
+    let rowA = $(board).find("#row-A");
+    let rowWidth = rowA.width();
+    let squareWidth = rowWidth / 10;
+    let squareHeight = squareWidth;
+    let columnLabelContainer = $("<div/>");
+    columnLabelContainer.width(rowWidth);
+
+    //Add column labels
+    for(let i = 0; i < 10; i ++){
+      var columnLabel = $("<div/>").addClass("column-label");
+      columnLabel.text(i+1);
+      columnLabel.width(squareWidth);
+      columnLabelContainer.append(columnLabel);
+    }
+    $(board).prepend(columnLabelContainer);
+
+    var rows = Array.from($(board).children(".board-row"));
+    for(let j = 0; j < 10; j++){
+      var curChar = String.fromCharCode(j + 65);
+      var rowLabel = $("<div/>").addClass("row-label");
+      rowLabel.text(curChar);
+      $(rows[j]).prepend(rowLabel)
+    }
+  })
+}
+
 createBoards(options, ["hero-board-container", "opponent-board-container"]);
+labelBoards();
+var curGame = new Game();
 
 /*
   We have a 10 x 10 board array:
@@ -123,4 +160,4 @@ createBoards(options, ["hero-board-container", "opponent-board-container"]);
 
 */
 
-var curGame = new Game();
+

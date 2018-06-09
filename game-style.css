@@ -1,9 +1,31 @@
+.game-container{
+}
+
+.board{
+  display:inline-block;
+}
+
 .board-row{
   display:block;
+  position:relative;
+}
+
+.column-label{
+  display:inline-block;
+  text-align:center;
+}
+
+.row-label{
+  width:10px;
+  display:block;
+  position:absolute;
+  left:-20px;
+  top:12px;
+  text-align:center;
 }
 
 .board-square{
-  outline: 1px solid black;
+  outline:solid black 1px;
   display:inline-block;
   height:100%;
 }
