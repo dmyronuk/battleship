@@ -1,4 +1,46 @@
 .game-container{
+  margin:20px;
+}
+
+#game-info-container{
+  border-radius:3px;
+  border:3px solid black;
+  height:200px;
+  width:800px;
+  display:flex;
+  text-align:center;
+}
+
+#game-info-left{
+  width:225px;
+  background:black;
+  color:white;
+  padding:10px;
+}
+
+#game-info-heading{
+  font-family: 'Press Start 2P', cursive;
+  border-bottom:white solid 2px;
+  padding-bottom:10px;
+}
+
+#game-info-text{
+  font-weight:bold;
+  padding-top:10px;
+}
+
+#game-info-right{
+  padding:10px;
+  width:500px;
+  display:flex;
+  flex-direction:row;
+  justify-content:space-evenly;
+  align-items:flex-end;
+}
+
+.row-label-container{
+  display:inline-block;
+  position:relative;
 }
 
 .board{
@@ -6,8 +48,6 @@
 }
 
 .board-row{
-  display:block;
-  position:relative;
 }
 
 .column-label{
@@ -17,15 +57,23 @@
 
 .row-label{
   width:10px;
-  display:block;
-  position:absolute;
-  left:-20px;
-  top:12px;
-  text-align:center;
+  position:relative;
 }
 
 .board-square{
   outline:solid black 1px;
   display:inline-block;
-  height:100%;
+}
+
+.ship-selection-container{
+  margin:0px 10px 0px 10px;
+  text-align:center;
+  width:80px;
+}
+
+.ship{
+  margin:auto;
+  border: solid 1px black;
+  background:red;
+  margin-bottom:5px;
 }

@@ -4,6 +4,7 @@
   <head>
     <meta charset="utf-8">
     <title> Battleship | Lighthouse Labs Prep </title>
+    <link href="https://fonts.googleapis.com/css?family=Press+Start+2P" rel="stylesheet">
     <link type="text/css" rel="stylesheet" href="page-style.css">
     <link type="text/css" rel="stylesheet" href="game-style.css">
     <script type="text/javascript" src="jquery-3.2.0.min.js"></script>
@@ -26,8 +27,26 @@
         </div>
 
         <div class=flex-container>
-          <div id="hero-board-container" class="game-container" owner="hero"></div>
-          <div id="opponent-board-container" class="game-container" owner="opponent"></div>
+          <div id="game-info-container">
+            <div id="game-info-left">
+              <div id="game-info-heading"></div>
+              <div id="game-info-text"></div>
+            </div>
+            <div id="game-info-right"></div>
+          </div>
+        </div>
+
+
+        <div class=flex-container>
+          <div id="hero-board-container" class="game-container" owner="hero">
+            <div class="row-label-container"></div>
+            <div class="board"></div>
+          </div>
+
+          <div id="opponent-board-container" class="game-container" owner="opponent">
+            <div class="row-label-container"></div>
+            <div class="board"></div>
+          </div>
         </div>
 
       </div>
@@ -38,4 +57,5 @@
   </body>
   <!-- <script type="text/javascript" src="chart-demo-b.js"></script> -->
   <script type="text/javascript" src="battleship.js"></script>
+
 </html>
