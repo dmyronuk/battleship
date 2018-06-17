@@ -1,10 +1,3 @@
-let options = {
-  squareWidth: 35,
-  squareHeight: 35,
-  squareColorA: "blue",
-  squareColorB: "#e5e5ff"
-}
-
 class Ship {
   constructor(name, length) {
     this.name = name;
