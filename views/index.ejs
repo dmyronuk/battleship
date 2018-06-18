@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title> Battleship | Lighthouse Labs Prep </title>
+    <link href="https://fonts.googleapis.com/css?family=Press+Start+2P" rel="stylesheet">
+    <link type="text/css" rel="stylesheet" href="/page-style.css">
+    <link type="text/css" rel="stylesheet" href="/game-style.css">
+    <script type="text/javascript" src="/jquery-3.2.0.min.js"></script>
+  </head>
+
+  <body>
+    <div id="top-bar">
+      <h1>Battleship</h1>
+      <h3>A Lighthouse Labs Prep Project</h3>
+    </div>
+
+    <div id="main-container">
+      <div id="main-container-mid">
+
+        <div class="text-container">
+          <div class="heading-container">
+            <h2>Overview</h2>
+            <a href="https://github.com/dmyronuk/lhl-bar-chart">https://github.com/dmyronuk/battleship</a>
+          </div>
+        </div>
+
+        <div class=flex-container>
+          <div id="game-info-container">
+            <div id="game-info-left">
+              <div id="game-info-heading"></div>
+              <div id="game-info-text"></div>
+            </div>
+            <div id="game-info-right"></div>
+          </div>
+        </div>
+
+
+        <div class=flex-container>
+          <div id="hero-board-container" class="game-container" owner="hero">
+            <div class="row-label-container"></div>
+            <div class="board"></div>
+          </div>
+
+          <div id="opponent-board-container" class="game-container" owner="opponent">
+            <div class="row-label-container"></div>
+            <div class="board"></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div id="footer">
+    </div>
+  </body>
+
+  <script type="text/javascript" src="/build-dom.js"></script>
+  <script type="text/javascript" src="/play.js"></script>
+
+</html>
