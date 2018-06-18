@@ -5,6 +5,37 @@ let options = {
   squareColorB: "#e5e5ff",
 }
 
+//both args are jquery objects - both column letter and row number are parsed as integers
+let getCoordsFromSquare = (squareObj, shipObj) => {
+  let coordsStr = squareObj.attr("id").split("-")[1];
+  let rowInt = coordsStr.slice(0, 1).charCodeAt();
+  let colInt = parseInt(coordsStr.slice(1));
+  return {row: rowInt, col: colInt};
+}
+
+let getShipCoordsFromSquare = (squareObj, shipObj) => {
+  let startCoords = getCoordsFromSquare(squareObj, shipObj);
+  console.log(startCoords)
+  let orientation = shipObj.attr("orientation");
+  console.log(orientation)
+  let outCoords = [];
+  //vertical placement
+  if(shipObj.attr("orientation") == 0){
+    for(let i = 0; i < shipObj.attr("length"); i++){
+      let curRowStr = String.fromCharCode(startCoords.row + i)
+      outCoords.push(curRowStr + startCoords.col);
+    }
+  //horizontal placement
+  }else{
+    let rowStr = String.fromCharCode(startCoords.row);
+    for(let i = 0; i < shipObj.attr("length"); i++){
+      let curColInt = startCoords.col + i;
+      outCoords.push(rowStr + curColInt);
+    }
+  }
+  return outCoords;
+}
+
 let calculateSquareColor = (rowChar, colNum) => {
   rowNum = rowChar.charCodeAt();
   let remainder = (rowNum % 2 === 0) ? 1 : 0;
@@ -80,32 +111,37 @@ let createBoards = (options, elems) => {
 
 //B up the container where player can select and place your battleships
 let displayShipPlacementInfo = (ships, options) => {
-    //hero is the player whose game state is being rendered by current browser
-    let gameInfoHeading = $("#game-info-heading");
-    gameInfoHeading.text("Place Your Battleships");
+  //hero is the player whose game state is being rendered by current browser
+  let gameInfoHeading = $("#game-info-heading");
+  gameInfoHeading.text("Place Your Battleships");
 
-    let gameInfoText = $("#game-info-text");
-    gameInfoText.text("Press 'R' to rotate");
+  let gameInfoText = $("#game-info-text");
+  gameInfoText.text("Press 'R' to rotate");
 
-    Object.keys(ships).forEach((shipKey) => {
-      let curShip = $("<div/>").addClass("ship");
-      let container = $("<div/>").addClass("ship-selection-container")
+  Object.keys(ships).forEach((shipKey) => {
+    let curShip = $("<div/>").addClass("ship");
+    let container = $("<div/>").addClass("ship-selection-container")
 
-      let curShipObj = ships[shipKey];
-      let length = curShipObj.length * options.squareHeight - 20;
-      let width = options.squareWidth - 7;
-      curShip.height(length);
-      curShip.width(width);
-      curShip.attr("id", curShipObj.name.toLowerCase());
-      curShip.attr("orientation", 0);
-      curShip.on("click", shipPlacementClickHandler);
+    let curShipObj = ships[shipKey];
+    let length = curShipObj.length * options.squareHeight - 20;
+    let width = options.squareWidth - 7;
+    curShip.height(length);
+    curShip.width(width);
+    curShip.attr("id", curShipObj.name.toLowerCase());
+    curShip.attr("orientation", 0);
+    curShip.attr("length", curShipObj.length);
+    curShip.on("click", shipPlacementClickHandler);
 
-      container.text(curShipObj.name)
-      container.prepend(curShip);
-      $("#game-info-right").append(container);
-    })
-  }
+    let maxRow = "A".charCodeAt() + curShipObj.length;
+    let maxCol = 10 - curShipObj.length + 1;
+    curShip.attr("max-row", maxRow);
+    curShip.attr("max-col", maxCol);
 
+    container.text(curShipObj.name);
+    container.prepend(curShip);
+    $("#game-info-right").append(container);
+  })
+}
 
 //wrapper that returns event handler mousemove when ship is being placed
 let shipMouseMoveHandler = (event) => {
@@ -129,32 +165,52 @@ let shipRotateHandler = (event) => {
   }
 }
 
+//make sure ship isn't placed outside of board
+let shipInValidPosition = (ship, square) => {
+  let squareCoords = getCoordsFromSquare(square);
+  let shipMaxColInt = parseInt(ship.attr("max-col"));
+  let shipMaxRowInt = parseInt(ship.attr("max-row"));
+  let orientation = ship.attr("orientation");
+
+  if(orientation == 0){
+    return squareCoords.row <= shipMaxRowInt;
+  }else if(orientation == 1)
+    return squareCoords.col <= shipMaxColInt;
+}
+
 let shipSetPlaceHandler = (event) => {
   let ship = event.data.ship
   //target is square when we successfully click on a board square but it could be any elem
   let target = $(event.target);
 
+  //target is a board square that belongs to hero
   if(target.hasClass("board-square") && target.attr("owner") === "hero"){
-    let left;
-    let top;
-    //vertical placement
-    if(ship.attr("orientation") == 0){
-      left ="-1px"
-      top = target.height() / 4 + "px";
-    //horizontal placement
-    }else{
-      left = target.width() / 4 + "px";
-      top = "2px"
-    }
 
-    target.append(ship);
-    ship.css("position", "relative");
-    ship.css("top", top );
-    ship.css("left", left);
-    $("#main-container-mid").off("mousemove", shipMouseMoveHandler);
-    $(window).off("keypress", shipRotateHandler);
-    $(window).off("click", shipSetPlaceHandler);
-    ship.off("click", shipPlacementClickHandler);
+    if(shipInValidPosition(ship, target)){
+      let left;
+      let top;
+      //vertical placement
+      if(ship.attr("orientation") == 0){
+        left ="-1px"
+        top = target.height() / 4 + "px";
+      //horizontal placement
+      }else{
+        left = target.width() / 4 + "px";
+        top = "2px"
+      }
+
+      target.append(ship);
+      ship.css("position", "relative");
+      ship.css("top", top );
+      ship.css("left", left);
+      $("#main-container-mid").off("mousemove", shipMouseMoveHandler);
+      $(window).off("keypress", shipRotateHandler);
+      $(window).off("click", shipSetPlaceHandler);
+      ship.off("click", shipPlacementClickHandler);
+
+      let shipCoords = getShipCoordsFromSquare(target, ship);
+      console.log(shipCoords)
+    }
   }
 }
 
@@ -167,6 +223,8 @@ let shipPlacementClickHandler = (event) => {
   ship.detach().appendTo(container);
   ship.css("position", "absolute")
   ship.css("pointer-events", "none");
+  ship.css("top", event.pageY - container.offset().top - options.squareHeight / 2);
+  ship.css("left", event.pageX - container.offset().left - options.squareWidth / 2);
 
   container.on("mousemove", {
     ship:ship,
@@ -183,8 +241,4 @@ let shipPlacementClickHandler = (event) => {
 
 let squareClickHandler = (event) => {
   console.log(event.target.id);
-}
-
-let test = () => {
-  console.log(...arguments)
 }
