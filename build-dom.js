@@ -16,6 +16,7 @@ let getCoordsFromSquare = (squareObj, shipObj) => {
 let getShipCoordsFromSquare = (squareObj, shipObj) => {
   let startCoords = getCoordsFromSquare(squareObj, shipObj);
   console.log(startCoords)
+  console.log(shipObj)
   let orientation = shipObj.attr("orientation");
   console.log(orientation)
   let outCoords = [];
@@ -132,7 +133,7 @@ let displayShipPlacementInfo = (ships, options) => {
     curShip.attr("length", curShipObj.length);
     curShip.on("click", shipPlacementClickHandler);
 
-    let maxRow = "A".charCodeAt() + curShipObj.length;
+    let maxRow = "J".charCodeAt() - curShipObj.length + 1;
     let maxCol = 10 - curShipObj.length + 1;
     curShip.attr("max-row", maxRow);
     curShip.attr("max-col", maxCol);
