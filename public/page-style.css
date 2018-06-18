@@ -15,7 +15,7 @@ h1 {
 }
 
 h2 {
-  font-size:28px;
+  font-size:20px;
   margin:0px;
 
 }
@@ -79,6 +79,15 @@ a:hover{
 
 .board-container{
   background:lightblue;
+}
+
+.board-label{
+  margin:auto;
+  color:black;
+  font-weight:bold;
+  text-align:center;
+  font-size:27px;
+  margin-bottom:10px;
 }
 
 #cur-player-board-container{

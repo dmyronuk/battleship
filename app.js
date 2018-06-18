@@ -13,6 +13,7 @@ class Ship {
     this.length = length;
     this.hits = 0;
     this.isOperational = true;
+    this.isPlaced = false;
   }
 
   checkIfSunk(){
@@ -42,6 +43,13 @@ class Player {
     }
     return ships;
   }
+
+  allShipsPlaced(){
+    return Object.keys(this.ships).reduce((acc, cur) => {
+      let curShip = this.ships[cur];
+      return acc && curShip.isPlaced;
+    }, true)
+  }
 };
 
 class Game {
@@ -65,10 +73,11 @@ class Game {
   }
 };
 
-const curGame = new Game();
+let curGame;
 
 app.get("/", (req, res) => {
   res.render("index")
+  curGame = new Game();
 })
 
 app.get("/place-hero-ships", (req, res) => {
@@ -82,9 +91,15 @@ app.post("/place-hero-ships", (req, res) => {
   let data = req.body;
   let shipName = data.name;
   let coords = data.coords;
+
+  hero.ships[shipName].isPlaced = true;
   coords.forEach((coord) => {
     hero.board[coord] = shipName;
   });
+
+  console.log(hero.allShipsPlaced());
+  let resData = JSON.stringify(hero.allShipsPlaced());
+  res.send(resData);
 })
 
 app.listen(PORT, () => {

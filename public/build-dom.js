@@ -44,7 +44,6 @@ let createSquare = (parentRow, ownerStr, rowChar, colNum) => {
   square.attr("owner", ownerStr);
   square.attr("id", `${ownerStr}-${rowChar}${colNum}`);
   //Need to pull the DOM element out of the jquery object
-  square.on("click", squareClickHandler);
   parentRow.append(square);
 }
 
@@ -104,11 +103,8 @@ let createBoards = (options, elems) => {
 //B up the container where player can select and place your battleships
 let displayShipPlacementInfo = (ships, options) => {
   //hero is the player whose game state is being rendered by current browser
-  let gameInfoHeading = $("#game-info-heading");
-  gameInfoHeading.text("Place Your Battleships");
-
-  let gameInfoText = $("#game-info-text");
-  gameInfoText.text("Press 'R' to rotate");
+  $("#game-info-heading").text("Place Your Battleships");
+  $("#game-info-text").text("Press 'R' to rotate");
 
   Object.keys(ships).forEach((shipKey) => {
     let curShip = $("<div/>").addClass("ship");
@@ -170,6 +166,10 @@ let shipInValidPosition = (ship, square) => {
     return squareCoords.col <= shipMaxColInt;
 }
 
+let allShipsPlacedCallback = () => {
+  console.log("All DONE");
+}
+
 let shipSetPlaceHandler = (event) => {
   let ship = event.data.ship
   //target is square when we successfully click on a board square but it could be any elem
@@ -212,7 +212,13 @@ let shipSetPlaceHandler = (event) => {
         data: shipJSON,
         dataType: "json",
         contentType: "application/json",
-      });
+        success: function(data){
+          let allShipsPlaced = JSON.parse(data);
+          if(allShipsPlaced){
+            placementFinishedHandler();
+          }
+        }
+      })
     }
   }
 }
@@ -239,7 +245,19 @@ let shipPlacementClickHandler = (event) => {
   )
   $(window).on("keypress", {ship:ship}, shipRotateHandler);
   $(window).on("click", {ship:ship}, shipSetPlaceHandler);
+}
 
+function placementFinishedHandler(){
+  $("#game-info-heading").text("Ready?");
+  $("#game-info-text").text("Click to start game");
+  $("#game-info-right").empty();
+  $("#game-info-container").on("click", startGame);
+}
+
+let startGame = () => {
+  $("#game-info-heading").text("Your Turn");
+  $("#game-info-text").text("Fire Torpedos");
+  $("#opponent-board-container").find(".board-square").on("click", squareClickHandler);
 }
 
 let squareClickHandler = (event) => {
