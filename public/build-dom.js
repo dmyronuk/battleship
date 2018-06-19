@@ -1,31 +1,23 @@
+let occupiedSquares = {
+  hero:[],
+  opponent:[],
+};
+
+let isInArray = (arr, elem) => {
+  return arr.reduce((acc, cur) => {
+    if(cur === elem){
+      acc = true;
+    }
+    return acc;
+  }, false)
+}
 
 //both args are jquery objects - both column letter and row number are parsed as integers
-let getCoordsFromSquare = (squareObj, shipObj) => {
+let getCoordsFromSquare = (squareObj) => {
   let coordsStr = squareObj.attr("id").split("-")[1];
   let rowInt = coordsStr.slice(0, 1).charCodeAt();
   let colInt = parseInt(coordsStr.slice(1));
   return {row: rowInt, col: colInt};
-}
-
-let getShipCoordsFromSquare = (squareObj, shipObj) => {
-  let startCoords = getCoordsFromSquare(squareObj, shipObj);
-  let orientation = shipObj.attr("orientation");
-  let outCoords = [];
-  //vertical placement
-  if(shipObj.attr("orientation") == 0){
-    for(let i = 0; i < shipObj.attr("length"); i++){
-      let curRowStr = String.fromCharCode(startCoords.row + i)
-      outCoords.push(curRowStr + startCoords.col);
-    }
-  //horizontal placement
-  }else{
-    let rowStr = String.fromCharCode(startCoords.row);
-    for(let i = 0; i < shipObj.attr("length"); i++){
-      let curColInt = startCoords.col + i;
-      outCoords.push(rowStr + curColInt);
-    }
-  }
-  return outCoords;
 }
 
 let calculateSquareColor = (rowChar, colNum) => {
@@ -100,6 +92,88 @@ let createBoards = (options, elems) => {
   }
 };
 
+//args: ship, owner, orientation, row, col
+//row string should have been converted to its charCode integer
+let getShipCoordsFromStartPos = (args) => {
+  let outCoords = [];
+  //vertical
+  if(args.orientation == 0){
+    for(let i = 0; i < args.length; i++){
+      let curRow = String.fromCharCode(args.row + i);
+      outCoords.push(curRow + args.col);
+    }
+  //horizontal placement
+  }else{
+    let rowStr = String.fromCharCode(args.row);
+    for(let i = 0; i < args.length; i++){
+      let curCol = args.col + i;
+      outCoords.push(rowStr + curCol);
+    }
+  }
+  return outCoords;
+}
+
+//args: ship, owner, orientation, row, col
+//returns the ships coordinates
+let shipInValidPosition = (args) => {
+  let maxRow = "J".charCodeAt() - args.ship.length + 1;
+  let maxCol = 10 - args.ship.length + 1;
+  //vertically placed ship is outside of board
+  if(args.orientation == 0 && args.row > maxRow){
+    return null;
+  //horizontally placed ship is outside of board
+  } else if(args.orientation == 1 && args.col > maxCol){
+    return null;
+  }else{
+    let shipCoords = getShipCoordsFromStartPos(args);
+    //test if any squares are already occupied and returns null if yes
+    return shipCoords.reduce((acc, cur) => {
+      if(isInArray(occupiedSquares[args.owner], cur)){
+        acc = null;
+      }
+      return acc;
+    }, shipCoords)
+  }
+};
+
+
+let placeComputerShips = (shipsObj) => {
+  let shipsKeys = Object.keys(shipsObj);
+  let outCoords = [];
+
+  shipsKeys.forEach(elem => {
+    let curShipObj = shipsObj[elem];
+    let iterationFinished = false;
+
+    while(! iterationFinished){
+      let randRow = Math.floor(Math.random() * 10) + 65;
+      let randCol = Math.ceil(Math.random() * 10);
+      let randOrientation = Math.round(Math.random());
+
+      let shipValidationArgs = {
+        ship: curShipObj,
+        length:curShipObj.length,
+        owner: "opponent",
+        orientation: randOrientation,
+        row: randRow,
+        col: randCol,
+      }
+      //returns the ships coordinates
+      let shipCoords = shipInValidPosition(shipValidationArgs);
+
+      if(shipCoords){
+        iterationFinished = true;
+        shipCoords.forEach(elem => {
+          occupiedSquares.opponent.push(elem);
+        })
+
+        let shipName = curShipObj.name.toLowerCase();
+        ajaxShipCoords(shipName, shipCoords, "opponent");
+      }
+    }
+  })
+};
+
 //B up the container where player can select and place your battleships
 let displayShipPlacementInfo = (ships, options) => {
   //hero is the player whose game state is being rendered by current browser
@@ -109,7 +183,6 @@ let displayShipPlacementInfo = (ships, options) => {
   Object.keys(ships).forEach((shipKey) => {
     let curShip = $("<div/>").addClass("ship");
     let container = $("<div/>").addClass("ship-selection-container")
-
     let curShipObj = ships[shipKey];
     let length = curShipObj.length * options.squareHeight - 20;
     let width = options.squareWidth - 7;
@@ -119,12 +192,6 @@ let displayShipPlacementInfo = (ships, options) => {
     curShip.attr("orientation", 0);
     curShip.attr("length", curShipObj.length);
     curShip.on("click", shipPlacementClickHandler);
-
-    let maxRow = "J".charCodeAt() - curShipObj.length + 1;
-    let maxCol = 10 - curShipObj.length + 1;
-    curShip.attr("max-row", maxRow);
-    curShip.attr("max-col", maxCol);
-
     container.text(curShipObj.name);
     container.prepend(curShip);
     $("#game-info-right").append(container);
@@ -153,21 +220,29 @@ let shipRotateHandler = (event) => {
   }
 }
 
-//make sure ship isn't placed outside of board
-let shipInValidPosition = (ship, square) => {
-  let squareCoords = getCoordsFromSquare(square);
-  let shipMaxColInt = parseInt(ship.attr("max-col"));
-  let shipMaxRowInt = parseInt(ship.attr("max-row"));
-  let orientation = ship.attr("orientation");
+let ajaxShipCoords = (shipName, shipCoords, owner) => {
+  let data = {
+    name: shipName,
+    coords: shipCoords,
+    playerName: owner,
+  }
 
-  if(orientation == 0){
-    return squareCoords.row <= shipMaxRowInt;
-  }else if(orientation == 1)
-    return squareCoords.col <= shipMaxColInt;
-}
-
-let allShipsPlacedCallback = () => {
-  console.log("All DONE");
+  let shipJSON = JSON.stringify(data);
+  $.ajax({
+    type: "POST",
+    url: "/place-ships",
+    data: shipJSON,
+    dataType: "json",
+    contentType: "application/json",
+    success: function(data){
+      if(owner === "hero"){
+        let allShipsPlaced = JSON.parse(data);
+        if(allShipsPlaced){
+          placementFinishedHandler();
+        }
+      }
+    }
+  })
 }
 
 let shipSetPlaceHandler = (event) => {
@@ -177,18 +252,28 @@ let shipSetPlaceHandler = (event) => {
 
   //target is a board square that belongs to hero
   if(target.hasClass("board-square") && target.attr("owner") === "hero"){
-
-    if(shipInValidPosition(ship, target)){
+    let squareCoords = getCoordsFromSquare(target);
+    let shipValidationArgs = {
+      ship: ship,
+      length:ship.attr("length"),
+      owner: "hero",
+      orientation: ship.attr("orientation"),
+      row: squareCoords.row,
+      col: squareCoords.col,
+    }
+    //validation needs to generate a list of ship coords so the validator function returns these coords || null
+    let shipCoords = shipInValidPosition(shipValidationArgs);
+    if(shipCoords){
       let left;
       let top;
       //vertical placement
       if(ship.attr("orientation") == 0){
-        left ="-1px"
+        left ="-1px";
         top = target.height() / 4 + "px";
       //horizontal placement
       }else{
         left = target.width() / 4 + "px";
-        top = "2px"
+        top = "2px";
       }
 
       target.append(ship);
@@ -200,25 +285,12 @@ let shipSetPlaceHandler = (event) => {
       $(window).off("click", shipSetPlaceHandler);
       ship.off("click", shipPlacementClickHandler);
 
-      let shipCoords = getShipCoordsFromSquare(target, ship);
-      let data = {
-        name: ship.attr("id"),
-        coords: shipCoords
-      }
-      let shipJSON = JSON.stringify(data);
-      $.ajax({
-        type: "POST",
-        url: "/place-hero-ships",
-        data: shipJSON,
-        dataType: "json",
-        contentType: "application/json",
-        success: function(data){
-          let allShipsPlaced = JSON.parse(data);
-          if(allShipsPlaced){
-            placementFinishedHandler();
-          }
-        }
+      //side effect: occupiedCoords is a global var to store positions
+      shipCoords.forEach(elem => {
+        occupiedSquares.hero.push(elem);
       })
+
+      ajaxShipCoords(ship.attr("id"), shipCoords, "hero");
     }
   }
 }

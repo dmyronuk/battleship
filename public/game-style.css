@@ -47,6 +47,17 @@
   display:inline-block;
 }
 
+.board-label{
+  margin:auto;
+  color:black;
+  font-weight:bold;
+  text-align:center;
+  font-size:20px;
+  margin-bottom:10px;
+  font-family: 'Press Start 2P', cursive;
+
+}
+
 .board-row{
 }
 

@@ -81,15 +81,6 @@ a:hover{
   background:lightblue;
 }
 
-.board-label{
-  margin:auto;
-  color:black;
-  font-weight:bold;
-  text-align:center;
-  font-size:27px;
-  margin-bottom:10px;
-}
-
 #cur-player-board-container{
 
 }

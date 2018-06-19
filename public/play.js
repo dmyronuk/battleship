@@ -8,9 +8,9 @@ let options = {
 createBoards(options, ["hero-board-container", "opponent-board-container"]);
 
 $(document).ready( () => {
-  $.getJSON("/place-hero-ships", {}, (data) => {
+  $.getJSON("/place-ships", {}, (data) => {
     let shipsObj = JSON.parse(data);
-    //need to convert it to an array of objects to work with existing code
+    placeComputerShips(shipsObj);
     displayShipPlacementInfo(shipsObj, options);
   })
 })

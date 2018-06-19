@@ -55,6 +55,7 @@ class Player {
 class Game {
   constructor(){
     this.currentPlayerId = 1;
+    //hero is "p1" and AI is "p2 by default"
     this.players = this.initPlayers();
     this.hero = "p1";
   }
@@ -80,25 +81,33 @@ app.get("/", (req, res) => {
   curGame = new Game();
 })
 
-app.get("/place-hero-ships", (req, res) => {
+app.get("/place-ships", (req, res) => {
   let ships = curGame.getHero().ships;
   let shipsJSON = JSON.stringify(ships);
   res.json(shipsJSON);
 })
 
-app.post("/place-hero-ships", (req, res) => {
-  let hero = curGame.getHero();
+app.post("/place-ships", (req, res) => {
   let data = req.body;
   let shipName = data.name;
   let coords = data.coords;
+  let player;
 
-  hero.ships[shipName].isPlaced = true;
+  if(data.playerName === "hero"){
+    player = curGame.getHero()
+  }else{
+    player = curGame.players["p2"];
+  }
+
+  player.ships[shipName].isPlaced = true;
   coords.forEach((coord) => {
-    hero.board[coord] = shipName;
+    player.board[coord] = shipName;
   });
 
-  console.log(hero.allShipsPlaced());
-  let resData = JSON.stringify(hero.allShipsPlaced());
+  console.log(curGame.players.p1.board)
+  console.log(curGame.players.p2.board)
+
+  let resData = JSON.stringify(player.allShipsPlaced());
   res.send(resData);
 })
 
