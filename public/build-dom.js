@@ -323,15 +323,95 @@ function placementFinishedHandler(){
   $("#game-info-heading").text("Ready?");
   $("#game-info-text").text("Click to start game");
   $("#game-info-right").empty();
-  $("#game-info-container").on("click", startGame);
+  $("#game-info-container").on("click", heroTurn);
 }
 
-let startGame = () => {
+let heroTurn = () => {
+  console.log("start hero turn")
   $("#game-info-heading").text("Your Turn");
-  $("#game-info-text").text("Fire Torpedos");
+  $("#game-info-text").text("Fire Torpedos!  Click an enemy square to fire.");
   $("#opponent-board-container").find(".board-square").on("click", squareClickHandler);
 }
 
+let displayShotMessage = (messageHeading, message) => {
+  $("#game-info-heading").text(messageHeading);
+  $("#game-info-text").text(message);
+}
+
+let displayShotGraphic = ($target, imgSrc) =>{
+  let shotImg = $("<img/>").addClass("board-img");
+  shotImg.attr("src", imgSrc);
+  $target.append(shotImg);
+};
+
+//hardcoded player for now
 let squareClickHandler = (event) => {
-  console.log(event.target.id);
+  event.stopPropagation();
+  console.log(event)
+  $("#opponent-board-container").find(".board-square").off("click", squareClickHandler);
+  let coord = event.target.id.split("-")[1];
+  let data = JSON.stringify(
+    {
+      coord: coord,
+      shooter: "p1",
+      target: "p2"
+    }
+  )
+  $.ajax({
+    type: "POST",
+    url: "/client-fire",
+    data: data,
+    dataType: "json",
+    contentType: "application/json",
+    success: function(data){
+      let message;
+      let messageHeading;
+      if(! data.status){
+        messageHeading = "Again?"
+        message = "You already targetted that coordinate!"
+      }else{
+        let imgSrc;
+        messageHeading = data.status;
+        if(data.status === "Miss"){
+          message = "The disappointment is palpable"
+          imgSrc = "/images/x.png";
+        }else{
+          message = `You hit the enemy's ${data.target}. More vodka comrade.`
+          imgSrc = "/images/explosion.png"
+        }
+        let $target = $(event.target);
+        displayShotGraphic($target, imgSrc);
+      }
+      displayShotMessage(messageHeading, message);
+
+      setTimeout(() => {
+        opponentTurn();
+      }, 3000)
+    }
+  })
+}
+
+let opponentTurn = () => {
+  $("#game-info-heading").text("Opponent Turn");
+  $("#game-info-text").text("Your crew waits in hushed expectation.");
+  $.get("/ai-fire", function(data){
+    console.log("after opponent fire", data, typeof data)
+    let parsedData = JSON.parse(data);
+    let message;
+    let messageHeading = parsedData.status;
+    if(parsedData.status === "Miss"){
+      message = "The enemy missed. You breathe a sigh of relief."
+      imgSrc = "/images/x.png";
+    }else{
+      message = `The enemy hit your ${parsedData.target}!`
+      imgSrc = "/images/explosion.png"
+    }
+    let target = $(`#hero-${parsedData.coord}`);
+    displayShotGraphic(target, imgSrc);
+    displayShotMessage(messageHeading, message);
+
+    setTimeout(() => {
+      heroTurn();
+    }, 3500)
+  })
 }

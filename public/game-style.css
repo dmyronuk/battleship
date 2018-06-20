@@ -1,5 +1,5 @@
 .game-container{
-  margin:20px;
+  margin:10px 30px 10px 30px;
 }
 
 #game-info-container{
@@ -87,4 +87,10 @@
   border: solid 1px black;
   background:red;
   margin-bottom:5px;
+}
+
+.board-img{
+  height:40px;
+  width:40px;
+  position:absolute;
 }

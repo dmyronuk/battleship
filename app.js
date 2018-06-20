@@ -25,6 +25,13 @@ class Ship {
   }
 };
 
+/*possible states for each square of board:
+  unoccupied & not hit -> undefined
+  unoccupied & hit -> 1
+  occupied & not hit -> {name:shipName, hit:false}
+  occupied & hit: {name:shipName, hit: true}
+*/
+
 class Player {
   constructor(num){
     this.playerId = num;
@@ -50,6 +57,12 @@ class Player {
       return acc && curShip.isPlaced;
     }, true)
   }
+
+  generateRandomCoords(){
+    let randCol = Math.ceil(Math.random() * 10);
+    let randRow = String.fromCharCode(Math.floor(Math.random() * 10) + 65);
+    return randRow + randCol;
+  }
 };
 
 class Game {
@@ -71,6 +84,38 @@ class Game {
 
   getHero(){
     return this.players[this.hero];
+  }
+
+  setNextPlayer(){
+    this.currentPlayerId = this.currentPlayerId % 2 + 1;
+  }
+
+  playerTurn(shooter, target, coord){
+    let targetUser = this.players[target];
+    let prevCoordState = targetUser.board[coord];
+    let outData = {
+      coord:coord,
+      status:null,
+      target:null,
+    };
+
+    if(prevCoordState === undefined){
+      targetUser.board[coord] = 1;
+      outData.status = "Miss";
+    //state 1 means that the square is empty and it has already been shot at
+    }else if(prevCoordState !== 1){
+      let hitShipName = prevCoordState.name;
+      outData.target = hitShipName;
+      //if haven't already hit this battleship
+      if(prevCoordstate.hit = false){
+        let hitShipObj = targetUser.ships[hitShipName];
+        hitShipObj.hits += 1;
+        hitShipObj.checkIfSunk();
+        outData.status = "Hit"
+      }
+    }
+    this.setNextPlayer();
+    return outData;
   }
 };
 
@@ -101,16 +146,45 @@ app.post("/place-ships", (req, res) => {
 
   player.ships[shipName].isPlaced = true;
   coords.forEach((coord) => {
-    player.board[coord] = shipName;
-  });
+    player.board[coord] = {name:shipName, hit:false};
+  })
 
-  console.log(curGame.players.p1.board)
-  console.log(curGame.players.p2.board)
+  console.log("Player 1 Board: ", curGame.players.p1.board + "\n")
+  console.log("Plyaer 2 Board:", curGame.players.p2.board)
 
   let resData = JSON.stringify(player.allShipsPlaced());
   res.send(resData);
+});
+
+app.post("/client-fire", (req, res) => {
+  let data = req.body;
+  let outData = curGame.playerTurn(data.shooter, data.target, data.coord);
+  let outJSON = JSON.stringify(outData);
+  console.log("Response from server to hero shot: ", outJSON)
+  res.send(outJSON);
+});
+
+app.get("/ai-fire", (req, res) => {
+  setTimeout(() => {
+    let cpuPlayer = curGame.players.p2;
+    let coords;
+
+    while(! coords){
+      let testCoords = cpuPlayer.generateRandomCoords();
+      let squareState = curGame.players.p1.board[testCoords];
+      //not squareState means space hasn't been fired on and is empty - not status 1 means it's not fired on but occupied
+      if(! squareState || ! squareState.status === 1){
+        coords = testCoords;
+      }
+    }
+
+    let outData = curGame.playerTurn("p2", "p1", coords);
+    let outJSON = JSON.stringify(outData);
+    console.log("Response from server from enemy shot: ", outJSON)
+    res.send(outJSON);
+  }, 2000)
 })
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
-})
+});
