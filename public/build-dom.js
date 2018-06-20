@@ -184,7 +184,7 @@ let displayShipPlacementInfo = (ships, options) => {
     let curShip = $("<div/>").addClass("ship");
     let container = $("<div/>").addClass("ship-selection-container")
     let curShipObj = ships[shipKey];
-    let length = curShipObj.length * options.squareHeight - 20;
+    let length = curShipObj.length * options.squareHeight - 7;
     let width = options.squareWidth - 7;
     curShip.height(length);
     curShip.width(width);
@@ -269,10 +269,10 @@ let shipSetPlaceHandler = (event) => {
       //vertical placement
       if(ship.attr("orientation") == 0){
         left ="-1px";
-        top = target.height() / 4 + "px";
+        top = target.height() / 8 - 1 + "px";
       //horizontal placement
       }else{
-        left = target.width() / 4 + "px";
+        left = target.width() / 8 - 1 + "px";
         top = "2px";
       }
 
@@ -377,7 +377,7 @@ let squareClickHandler = (event) => {
           imgSrc = "/images/x.png";
         }else{
           message = `You hit the enemy's ${data.target}. More vodka comrade.`
-          imgSrc = "/images/explosion.png"
+          imgSrc = "/images/explosion-c.png"
         }
         let $target = $(event.target);
         displayShotGraphic($target, imgSrc);
@@ -404,7 +404,7 @@ let opponentTurn = () => {
       imgSrc = "/images/x.png";
     }else{
       message = `The enemy hit your ${parsedData.target}!`
-      imgSrc = "/images/explosion.png"
+      imgSrc = "/images/explosion-c.png"
     }
     let target = $(`#hero-${parsedData.coord}`);
     displayShotGraphic(target, imgSrc);

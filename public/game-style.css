@@ -5,7 +5,7 @@
 #game-info-container{
   border-radius:3px;
   border:3px solid black;
-  height:200px;
+  height:210px;
   width:800px;
   display:flex;
   text-align:center;
@@ -55,7 +55,6 @@
   font-size:20px;
   margin-bottom:10px;
   font-family: 'Press Start 2P', cursive;
-
 }
 
 .board-row{
@@ -72,6 +71,7 @@
 }
 
 .board-square{
+  position:relative;
   outline:solid black 1px;
   display:inline-block;
 }
@@ -87,10 +87,13 @@
   border: solid 1px black;
   background:red;
   margin-bottom:5px;
+  z-index:100;
 }
 
 .board-img{
-  height:40px;
-  width:40px;
+  height:30px;
+  width:30px;
   position:absolute;
+  top:0px;
+  z-index:1000;
 }

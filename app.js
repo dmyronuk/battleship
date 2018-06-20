@@ -27,7 +27,7 @@ class Ship {
 
 /*possible states for each square of board:
   unoccupied & not hit -> undefined
-  unoccupied & hit -> 1
+  unoccupied & hit -> {name:null, hit:true}
   occupied & not hit -> {name:shipName, hit:false}
   occupied & hit: {name:shipName, hit: true}
 */
@@ -100,10 +100,10 @@ class Game {
     };
 
     if(! prevCoordState){
-      targetUser.board[coord] = 1;
+      targetUser.board[coord] = {name:null, hit:true};
       outData.status = "Miss";
-    //state 1 means that the square is empty and it has already been shot at
-    }else if(prevCoordState !== 1){
+    //state null means that the square is empty and it has already been hit
+    }else if(prevCoordState.name !== null){
       let hitShipName = prevCoordState.name;
       outData.target = hitShipName;
       //if haven't already hit this battleship
@@ -180,8 +180,14 @@ app.get("/ai-fire", (req, res) => {
     while(! coords){
       let testCoords = cpuPlayer.generateRandomCoords();
       let squareState = curGame.players.p1.board[testCoords];
-      //not squareState means space hasn't been fired on and is empty - not status 1 means it's not fired on but occupied
-      if(! squareState || ! squareState.status === 1){
+      console.log("Enemy trying to pick a square, trying this coord", testCoords);
+      console.log("Cur squareState: ", squareState)
+      // SquareState is undefined for empty square that haven't been hit so this catches a miss;
+      if(! squareState){
+        console.log("Enemy Miss")
+        coords = testCoords;
+      }else if(squareState.name && squareState.hit === false ){
+        console.log("Enemy Hit");
         coords = testCoords;
       }
     }
