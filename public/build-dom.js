@@ -269,10 +269,10 @@ let shipSetPlaceHandler = (event) => {
       //vertical placement
       if(ship.attr("orientation") == 0){
         left ="-1px";
-        top = target.height() / 8 - 1 + "px";
+        top = target.height() / 8 - 2 + "px";
       //horizontal placement
       }else{
-        left = target.width() / 8 - 1 + "px";
+        left = target.width() / 8 - 2 + "px";
         top = "2px";
       }
 
@@ -371,12 +371,13 @@ let squareClickHandler = (event) => {
         message = "You already targetted that coordinate!"
       }else{
         let imgSrc;
-        messageHeading = data.status;
         if(data.status === "Miss"){
+          messageHeading = data.status;
           message = "The disappointment is palpable"
           imgSrc = "/images/x.png";
         }else{
-          message = `You hit the enemy's ${data.target}. More vodka comrade.`
+          messageHeading = `Enemy ${data.target} Hit!`;
+          message = (data.shipIsSunk) ? `You sunk the enemy's ${data.target}.` : `Excellent, more vodka comrade.`
           imgSrc = "/images/explosion-c.png"
         }
         let $target = $(event.target);
@@ -398,12 +399,15 @@ let opponentTurn = () => {
     console.log("after opponent fire", data, typeof data)
     let parsedData = JSON.parse(data);
     let message;
-    let messageHeading = parsedData.status;
+    let messageHeading;
     if(parsedData.status === "Miss"){
+      messageHeading = parsedData.status;
       message = "The enemy missed. You breathe a sigh of relief."
       imgSrc = "/images/x.png";
     }else{
-      message = `The enemy hit your ${parsedData.target}!`
+      let shipName = parsedData.target[0].toUpperCase() + parsedData.target.slice(1);
+      messageHeading = `${shipName} Hit!`;
+      message = (parsedData.shipIsSunk) ? `The enemy has sunk your ${parsedData.target}.` : `Steady yourself comrade, all is not lost.`
       imgSrc = "/images/explosion-c.png"
     }
     let target = $(`#hero-${parsedData.coord}`);

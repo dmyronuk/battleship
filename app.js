@@ -97,6 +97,7 @@ class Game {
       coord:coord,
       status:null,
       target:null,
+      shipIsSunk:false
     };
 
     if(! prevCoordState){
@@ -107,12 +108,10 @@ class Game {
       let hitShipName = prevCoordState.name;
       outData.target = hitShipName;
       //if haven't already hit this battleship
-      console.log("prevCoordState: ", prevCoordState)
       if(prevCoordState.hit === false){
-        console.log("this ran")
         let hitShipObj = targetUser.ships[hitShipName];
         hitShipObj.hits += 1;
-        hitShipObj.checkIfSunk();
+        outData.shipIsSunk = hitShipObj.checkIfSunk();
         outData.status = "Hit"
       }
     }
