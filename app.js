@@ -99,7 +99,7 @@ class Game {
       target:null,
     };
 
-    if(prevCoordState === undefined){
+    if(! prevCoordState){
       targetUser.board[coord] = 1;
       outData.status = "Miss";
     //state 1 means that the square is empty and it has already been shot at
@@ -107,7 +107,9 @@ class Game {
       let hitShipName = prevCoordState.name;
       outData.target = hitShipName;
       //if haven't already hit this battleship
-      if(prevCoordstate.hit = false){
+      console.log("prevCoordState: ", prevCoordState)
+      if(prevCoordState.hit === false){
+        console.log("this ran")
         let hitShipObj = targetUser.ships[hitShipName];
         hitShipObj.hits += 1;
         hitShipObj.checkIfSunk();
@@ -146,10 +148,16 @@ app.post("/place-ships", (req, res) => {
 
   player.ships[shipName].isPlaced = true;
   coords.forEach((coord) => {
-    player.board[coord] = {name:shipName, hit:false};
+    let newBoardEntry = {
+      name:shipName,
+      hit:false,
+    }
+    player.board[coord] = newBoardEntry;
+    console.log("p1 board, entry, coord", player.board[coord], coord )
   })
 
-  console.log("Player 1 Board: ", curGame.players.p1.board + "\n")
+  console.log("Player 1 Board: ", curGame.players.p1.board)
+  console.log("\n")
   console.log("Plyaer 2 Board:", curGame.players.p2.board)
 
   let resData = JSON.stringify(player.allShipsPlaced());
