@@ -326,6 +326,10 @@ function placementFinishedHandler(){
   $("#game-info-container").on("click", heroTurn);
 }
 
+let setStateGameOver = () => {
+  console.log("Game Over")
+}
+
 let heroTurn = () => {
   console.log("start hero turn")
   $("#game-info-heading").text("Your Turn");
@@ -385,9 +389,13 @@ let squareClickHandler = (event) => {
       }
       displayShotMessage(messageHeading, message);
 
-      setTimeout(() => {
-        opponentTurn();
-      }, 3000)
+      if(data.gameOver){
+        setStateGameOver();
+      }else{
+        setTimeout(() => {
+          opponentTurn();
+        }, 3000)
+      }
     }
   })
 }
@@ -414,8 +422,12 @@ let opponentTurn = () => {
     displayShotGraphic(target, imgSrc);
     displayShotMessage(messageHeading, message);
 
-    setTimeout(() => {
-      heroTurn();
-    }, 3500)
+    if(parsedData.gameOver){
+      setStateGameOver();
+    }else{
+      setTimeout(() => {
+        heroTurn();
+      }, 3500)
+    }
   })
 }

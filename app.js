@@ -58,6 +58,16 @@ class Player {
     }, true)
   }
 
+  allShipsSunk(){
+    return Object.keys(this.ships).reduce((acc, cur) => {
+      let curShip = this.ships[cur];
+      if(curShip.isOperational){
+        acc = false;
+      }
+      return acc;
+    }, true)
+  }
+
   generateRandomCoords(){
     let randCol = Math.ceil(Math.random() * 10);
     let randRow = String.fromCharCode(Math.floor(Math.random() * 10) + 65);
@@ -71,6 +81,7 @@ class Game {
     //hero is "p1" and AI is "p2 by default"
     this.players = this.initPlayers();
     this.hero = "p1";
+    this.winner = null;
   }
 
   initPlayers(){
@@ -95,9 +106,10 @@ class Game {
     let prevCoordState = targetUser.board[coord];
     let outData = {
       coord:coord,
-      status:null,
-      target:null,
-      shipIsSunk:false
+      status: null,
+      target: null,
+      shipIsSunk: false,
+      gameOver: false,
     };
 
     if(! prevCoordState){
@@ -115,8 +127,15 @@ class Game {
         outData.status = "Hit"
       }
     }
-    this.setNextPlayer();
-    return outData;
+    if(targetUser.allShipsSunk()){
+      curGame.winner = shooter;
+      outData.winner = shooter;
+      outData.gameOver = true;
+      return outData;
+    }else{
+      this.setNextPlayer();
+      return outData;
+    }
   }
 };
 
