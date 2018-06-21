@@ -37,6 +37,7 @@ class Player {
     this.playerId = num;
     this.board = {}
     this.ships = this.initShips();
+    this.alias = null;
   }
 
   initShips(){
@@ -144,6 +145,12 @@ let curGame;
 app.get("/", (req, res) => {
   res.render("index")
   curGame = new Game();
+})
+
+app.post("/start", (req, res) => {
+  curGame.players.p1.alias = req.body.userName;
+  curGame.players.p1.alias = req.body.opponentName;
+  res.json("We did it")
 })
 
 app.get("/place-ships", (req, res) => {

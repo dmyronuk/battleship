@@ -1,3 +1,10 @@
+let options = {
+  squareWidth: 35,
+  squareHeight: 35,
+  squareColorA: "blue",
+  squareColorB: "#e5e5ff",
+}
+
 let occupiedSquares = {
   hero:[],
   opponent:[],
@@ -179,6 +186,7 @@ let displayShipPlacementInfo = (ships, options) => {
   //hero is the player whose game state is being rendered by current browser
   $("#game-info-heading").text("Place Your Battleships");
   $("#game-info-text").text("Press 'R' to rotate");
+  $("#game-info-right").css("align-items", "flex-end");
 
   Object.keys(ships).forEach((shipKey) => {
     let curShip = $("<div/>").addClass("ship");
@@ -321,7 +329,7 @@ let shipPlacementClickHandler = (event) => {
 
 function placementFinishedHandler(){
   $("#game-info-heading").text("Ready?");
-  $("#game-info-text").text("Click to start game");
+  $("#game-info-text").text("Click to begin.");
   $("#game-info-right").empty();
   $("#game-info-container").on("click", heroTurn);
 }
@@ -331,7 +339,6 @@ let setStateGameOver = () => {
 }
 
 let heroTurn = () => {
-  console.log("start hero turn")
   $("#game-info-heading").text("Your Turn");
   $("#game-info-text").text("Fire Torpedos!  Click an enemy square to fire.");
   $("#opponent-board-container").find(".board-square").on("click", squareClickHandler);
@@ -431,3 +438,40 @@ let opponentTurn = () => {
     }
   })
 }
+
+createBoards(options, ["hero-board-container", "opponent-board-container"]);
+$(document).ready(() => {
+  $("#game-info-right").find("td").on("click", function(event){
+    let selectedOpponentName = $(event.target).text();
+    $("#game-info-left").find("#opponent-input").val(selectedOpponentName)
+  })
+
+  $("#start-game-button").on("click", function(event){
+    let $form = $(event.target).parent();
+    let userName = $form.find(".start-game-input").val();
+    let opponentName = $form.find("#opponent-input").val();
+    let data = JSON.stringify({userName: userName, opponentName: opponentName});
+    console.log("data sent to server: ", data)
+    event.preventDefault();
+    if(userName && opponentName){
+      $.ajax({
+        url: "/start",
+        type: "POST",
+        dataType: "json",
+        contentType:"application/json",
+        data: data,
+        success: function(resData){
+          $.getJSON("/place-ships", {}, (data) => {
+            $("#game-info-right").empty();
+            $("#game-info-left").find("form").remove();
+            let shipsObj = JSON.parse(data);
+            placeComputerShips(shipsObj);
+            displayShipPlacementInfo(shipsObj, options);
+          })
+        }
+      })
+    }else{
+      $("#game-info-text").text("We're still waiting for a name...")
+    }
+  })
+})
