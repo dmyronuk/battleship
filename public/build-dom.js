@@ -3,6 +3,7 @@ let options = {
   squareHeight: 35,
   squareColorA: "blue",
   squareColorB: "#e5e5ff",
+  turnWaitTime:0,
 }
 
 let occupiedSquares = {
@@ -379,8 +380,15 @@ function placementFinishedHandler(){
   $("#game-info-container").on("click", heroTurn);
 }
 
-let setStateGameOver = () => {
-  console.log("Game Over")
+let setStateGameOver = (data) => {
+  console.log("Game over data:", data)
+  $("#game-info-heading").text(`${data.winnerAlias} Wins`);
+  if(data.winner === "p1"){
+    var message = "Your crew basks in the glory of victory!"
+  }else{
+    var message = "To the bottom of the salty depths with ye!"
+  }
+  $("#game-info-text").text(message);
 }
 
 let heroTurn = () => {
@@ -456,11 +464,11 @@ let squareClickHandler = (event) => {
       displayShotMessage(messageHeading, message);
 
       if(data.gameOver){
-        setStateGameOver();
+        setStateGameOver(data);
       }else{
         setTimeout(() => {
           opponentTurn();
-        }, 3000)
+        }, options.turnWaitTime)
       }
     }
   })
@@ -499,7 +507,7 @@ let opponentTurn = () => {
     }else{
       setTimeout(() => {
         heroTurn();
-      }, 3500)
+      }, options.turnWaitTime)
     }
   })
 }

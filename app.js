@@ -139,7 +139,14 @@ class Game {
     }
     if(targetUser.allShipsSunk()){
       curGame.winner = shooter;
+      let winnerAlias = this.players[shooter].alias;
+      let clientAlias = this.players.p1.alias;
+      let clientGameResult = (winnerAlias === clientAlias) ? "wins" : "losses";
+      db.players[clientAlias][clientGameResult] ++;
+      writeDB();
+
       outData.winner = shooter;
+      outData.winnerAlias = winnerAlias;
       outData.gameOver = true;
       return outData;
     }else{
@@ -157,17 +164,16 @@ app.get("/", (req, res) => {
 });
 
 app.post("/start", (req, res) => {
-  let curPlayerData;
-  let userName = req.bodyUserName;
+  let userName = req.body.userName;
   curGame.players.p1.alias = userName;
   curGame.players.p2.alias = req.body.opponentName;
 
-  if(! db.players[userName]){
-    curPlayerData = {wins:0, losses:0};
-    db[userName] = curPlayerData;
+  if(db.players[userName] === undefined){
+    var curPlayerData = {wins:0, losses:0};
+    db.players[userName] = curPlayerData;
     writeDB();
   }else{
-    curPlayerData = db.players[userName];
+    var curPlayerData = db.players[userName];
   }
   res.json(curPlayerData);
 });
@@ -197,7 +203,6 @@ app.post("/place-ships", (req, res) => {
       hit:false,
     }
     player.board[coord] = newBoardEntry;
-    console.log("p1 board, entry, coord", player.board[coord], coord )
   })
 
   console.log("Player 1 Board: ", curGame.players.p1.board)
@@ -224,21 +229,16 @@ app.get("/ai-fire", (req, res) => {
     while(! coords){
       let testCoords = cpuPlayer.generateRandomCoords();
       let squareState = curGame.players.p1.board[testCoords];
-      console.log("Enemy trying to pick a square, trying this coord", testCoords);
-      console.log("Cur squareState: ", squareState)
       // SquareState is undefined for empty square that haven't been hit so this catches a miss;
       if(! squareState){
-        console.log("Enemy Miss")
         coords = testCoords;
       }else if(squareState.name && squareState.hit === false ){
-        console.log("Enemy Hit");
         coords = testCoords;
       }
     }
 
     let outData = curGame.playerTurn("p2", "p1", coords);
     let outJSON = JSON.stringify(outData);
-    console.log("Response from server from enemy shot: ", outJSON)
     res.send(outJSON);
   }, 2000)
 })
