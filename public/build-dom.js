@@ -51,8 +51,8 @@ let createRowLabel = (board, rowChar) => {
   let rowLabelContainer = board.siblings(".row-label-container");
   let rowLabel = $("<div/>").addClass("row-label");
   rowLabel.css("height", options.squareHeight);
-  rowLabel.css("top", options.squareHeight * -3 / 10)
-  rowLabel.text(rowChar)
+  rowLabel.css("top", options.squareHeight * -3 / 10);
+  rowLabel.text(rowChar);
   rowLabelContainer.append(rowLabel);
 }
 
@@ -117,6 +117,7 @@ let createScoreBoard = () => {
   container.append([$heading, $heroTable, $opponentTable]);
 };
 
+//dynamically build game boards for both players
 let createBoards = (options, elems) => {
   for(elem of elems){
     let ownerStr = $("#" + elem).attr("owner");
@@ -196,6 +197,7 @@ let placeComputerShips = (shipsObj) => {
     let curShipObj = shipsObj[elem];
     let iterationFinished = false;
 
+    //try a random ship position
     while(! iterationFinished){
       let randRow = Math.floor(Math.random() * 10) + 65;
       let randCol = Math.ceil(Math.random() * 10);
@@ -209,7 +211,7 @@ let placeComputerShips = (shipsObj) => {
         row: randRow,
         col: randCol,
       }
-      //returns the ships coordinates
+      //checks if ship is in valid position and returns the ship's coordinates
       let shipCoords = shipInValidPosition(shipValidationArgs);
 
       if(shipCoords){
@@ -225,7 +227,7 @@ let placeComputerShips = (shipsObj) => {
   })
 };
 
-//B up the container where player can select and place your battleships
+//Create the container where player can select and place battleships
 let displayShipPlacementInfo = (ships, options) => {
   //hero is the player whose game state is being rendered by current browser
   $("#game-info-heading").text("Place Your Battleships");
@@ -244,7 +246,6 @@ let displayShipPlacementInfo = (ships, options) => {
     curShip.attr("orientation", 0);
     curShip.attr("length", curShipObj.length);
     curShip.on("click", shipPlacementClickHandler);
-    console.log(curShipObj.imageURL)
     container.text(curShipObj.name);
     container.prepend(curShip);
     $("#game-info-right").append(container);
@@ -272,7 +273,7 @@ let shipRotateHandler = (event) => {
     ship.attr("orientation", newOrientation);
   }
 }
-
+//Since the AI's random ship placement is done on the client side, we need to send the coords back to the server
 let ajaxShipCoords = (shipName, shipCoords, owner) => {
   let data = {
     name: shipName,
@@ -319,11 +320,11 @@ let shipSetPlaceHandler = (event) => {
     if(shipCoords){
       let left;
       let top;
-      //vertical placement
+      //vertical placement adjusstment
       if(ship.attr("orientation") == 0){
         left ="-1px";
         top = target.height() / 8 - 2 + "px";
-      //horizontal placement
+      //horizontal placement adjustment
       }else{
         left = target.width() / 8 - 2 + "px";
         top = "2px";
@@ -348,6 +349,7 @@ let shipSetPlaceHandler = (event) => {
   }
 }
 
+//handler to move the ship around place it on the game board
 let shipPlacementClickHandler = (event) => {
   let ship = $(event.target);
   let container = $("#main-container-mid");
@@ -355,7 +357,7 @@ let shipPlacementClickHandler = (event) => {
   //0 represents vertical, 1 represents horizontal
 
   ship.detach().appendTo(container);
-  ship.css("position", "absolute")
+  ship.css("position", "absolute");
   ship.css("pointer-events", "none");
   ship.css("top", event.pageY - container.offset().top - options.squareHeight / 2);
   ship.css("left", event.pageX - container.offset().left - options.squareWidth / 2);
@@ -382,12 +384,11 @@ function placementFinishedHandler(){
 }
 
 let setStateGameOver = (data) => {
-  console.log("Game over data:", data)
   $("#game-info-heading").text(`${data.winnerAlias} Wins`);
   if(data.winner === "p1"){
-    var message = "Your crew basks in the glory of victory!"
+    var message = "Your crew basks in the glory of victory!";
   }else{
-    var message = "To the bottom of the salty depths with ye!"
+    var message = "To the bottom of the salty depths with ye!";
   }
   $("#game-info-text").text(message);
 }
@@ -432,7 +433,6 @@ let updateGameLog = (data) => {
 //hardcoded player for now
 let squareClickHandler = (event) => {
   event.stopPropagation();
-  console.log(event)
   $("#opponent-board-container").find(".board-square").off("click", squareClickHandler);
   let coord = event.target.id.split("-")[1];
   let data = JSON.stringify(
@@ -496,12 +496,12 @@ let opponentTurn = () => {
     let messageHeading;
     if(parsedData.status === "Miss"){
       messageHeading = parsedData.status;
-      message = "The enemy missed. You breathe a sigh of relief."
+      message = "The enemy missed. You breathe a sigh of relief.";
       imgSrc = "/images/x.png";
     }else{
       let shipName = parsedData.target[0].toUpperCase() + parsedData.target.slice(1);
       messageHeading = `${shipName} Hit!`;
-      imgSrc = "/images/explosion-c.png"
+      imgSrc = "/images/explosion-c.png";
 
       if(parsedData.shipIsSunk){
          message =`The enemy has sunk your ${parsedData.target}.`;
@@ -529,7 +529,7 @@ createBoards(options, ["hero-board-container", "opponent-board-container"]);
 $(document).ready(() => {
   $("#game-info-right").find("td").on("click", function(event){
     let selectedOpponentName = $(event.target).text();
-    $("#game-info-left").find("#opponent-input").val(selectedOpponentName)
+    $("#game-info-left").find("#opponent-input").val(selectedOpponentName);
   })
 
   $("#start-game-button").on("click", function(event){
@@ -561,7 +561,7 @@ $(document).ready(() => {
         }
       })
     }else{
-      $("#game-info-text").text("We're still waiting for a name...")
+      $("#game-info-text").text("We're still waiting for a name...");
     }
   })
 })

@@ -206,10 +206,6 @@ app.post("/place-ships", (req, res) => {
     player.board[coord] = newBoardEntry;
   })
 
-  console.log("Player 1 Board: ", curGame.players.p1.board)
-  console.log("\n")
-  console.log("Plyaer 2 Board:", curGame.players.p2.board)
-
   let resData = JSON.stringify(player.allShipsPlaced());
   res.send(resData);
 });
@@ -218,7 +214,6 @@ app.post("/client-fire", (req, res) => {
   let data = req.body;
   let outData = curGame.playerTurn(data.shooter, data.target, data.coord);
   let outJSON = JSON.stringify(outData);
-  console.log("Response from server to hero shot: ", outJSON)
   res.send(outJSON);
 });
 
@@ -240,7 +235,6 @@ app.get("/ai-fire", (req, res) => {
 
     let outData = curGame.playerTurn("p2", "p1", coords);
     let outJSON = JSON.stringify(outData);
-    console.log("Response from server to ai shot: ", outJSON)
     res.send(outJSON);
   }, 2000)
 })
