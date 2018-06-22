@@ -2,10 +2,13 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const app = express();
 const PORT = 8080;
+const fs = require("fs");
 
 app.set("view engine", "ejs");
 app.use(express.static(__dirname + "/public"));
 app.use(bodyParser.json());
+
+let db = require("./database.json");
 
 class Ship {
   constructor(name, length) {
@@ -31,6 +34,11 @@ class Ship {
   occupied & not hit -> {name:shipName, hit:false}
   occupied & hit: {name:shipName, hit: true}
 */
+
+let writeDB = () => {
+  let outData = JSON.stringify(db);
+  fs.writeFile("./database.json", outData);
+}
 
 class Player {
   constructor(num){
@@ -143,21 +151,31 @@ class Game {
 let curGame;
 
 app.get("/", (req, res) => {
-  res.render("index")
   curGame = new Game();
-})
+  res.render("index");
+});
 
 app.post("/start", (req, res) => {
-  curGame.players.p1.alias = req.body.userName;
-  curGame.players.p1.alias = req.body.opponentName;
-  res.json("We did it")
-})
+  let curPlayerData;
+  let userName = req.bodyUserName;
+  curGame.players.p1.alias = userName;
+  curGame.players.p2.alias = req.body.opponentName;
+
+  if(! db.players[userName]){
+    curPlayerData = {wins:0, losses:0};
+    db[userName] = curPlayerData;
+    writeDB();
+  }else{
+    curPlayerData = db.players[userName];
+  }
+  res.json(curPlayerData);
+});
 
 app.get("/place-ships", (req, res) => {
   let ships = curGame.getHero().ships;
   let shipsJSON = JSON.stringify(ships);
   res.json(shipsJSON);
-})
+});
 
 app.post("/place-ships", (req, res) => {
   let data = req.body;

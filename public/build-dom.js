@@ -73,6 +73,48 @@ let createColumnLabels = (board) => {
   $(board).prepend(columnLabelContainer);
 };
 
+createScoreboardTable = (playerName) => {
+  return $(
+  `<div>
+    <div class="scoreboard-name">${playerName}</div>
+    <table class="scoreboard-table">
+      <tr>
+        <td>Carrier:</td>
+        <td class="operational-td">Operational</td>
+      </tr>
+      <tr>
+        <td>Battleship:</td>
+        <td class="operational-td">Operational</td>
+      </tr>
+      <tr>
+        <td>Cruiser:</td>
+        <td class="operational-td">Operational</td>
+      </tr>
+      <tr>
+        <td>Submarine:</td>
+        <td class="operational-td">Operational</td>
+      </tr>
+      <tr>
+        <td>Destroyer:</td>
+        <td class="operational-td">Operational</td>
+      </tr>
+    </table>
+  </div>
+`);
+}
+
+let createScoreBoard = () => {
+  let container = $("#game-info-right");
+  let userName = container.data("userName");
+  let opponentName = container.data("opponentName");
+  let wins = container.data("wins");
+  let losses = container.data("losses");
+  let $heading = $(`<div class="score-wins">Wins: ${wins} Losses: ${losses}</div>`);
+  let $heroTable = createScoreboardTable(userName);
+  let $opponentTable = createScoreboardTable(opponentName);
+  container.append([$heading, $heroTable, $opponentTable]);
+};
+
 let createBoards = (options, elems) => {
   for(elem of elems){
     let ownerStr = $("#" + elem).attr("owner");
@@ -328,9 +370,10 @@ let shipPlacementClickHandler = (event) => {
 }
 
 function placementFinishedHandler(){
+  $("#game-info-right").empty();
+  createScoreBoard();
   $("#game-info-heading").text("Ready?");
   $("#game-info-text").text("Click to begin.");
-  $("#game-info-right").empty();
   $("#game-info-container").on("click", heroTurn);
 }
 
@@ -461,9 +504,14 @@ $(document).ready(() => {
         contentType:"application/json",
         data: data,
         success: function(resData){
+          $gameInfoRight = $("#game-info-right");
+          $gameInfoRight.empty();
+          $gameInfoRight.data("userName", userName);
+          $gameInfoRight.data("wins", resData.wins);
+          $gameInfoRight.data("losses", resData.losses);
+          $gameInfoRight.data("opponentName", opponentName);
+          $("#game-info-left").find("form").remove();
           $.getJSON("/place-ships", {}, (data) => {
-            $("#game-info-right").empty();
-            $("#game-info-left").find("form").remove();
             let shipsObj = JSON.parse(data);
             placeComputerShips(shipsObj);
             displayShipPlacementInfo(shipsObj, options);
