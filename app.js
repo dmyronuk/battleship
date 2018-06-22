@@ -120,6 +120,7 @@ class Game {
       target: null,
       shipIsSunk: false,
       gameOver: false,
+      alias: this.players[shooter].alias
     };
 
     if(! prevCoordState){
@@ -239,6 +240,7 @@ app.get("/ai-fire", (req, res) => {
 
     let outData = curGame.playerTurn("p2", "p1", coords);
     let outJSON = JSON.stringify(outData);
+    console.log("Response from server to ai shot: ", outJSON)
     res.send(outJSON);
   }, 2000)
 })

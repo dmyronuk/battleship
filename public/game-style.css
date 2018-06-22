@@ -170,3 +170,18 @@
   top:0px;
   z-index:1000;
 }
+
+.game-log-table{
+  width:250px;
+  margin-top:30px;
+  padding:5px 0px 5px 0px;
+}
+
+.game-log-table th{
+  text-align:center;
+  border-bottom:1px solid black;
+}
+
+.hidden-elem{
+  display:none;
+}

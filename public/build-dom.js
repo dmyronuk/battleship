@@ -3,7 +3,7 @@ let options = {
   squareHeight: 35,
   squareColorA: "blue",
   squareColorB: "#e5e5ff",
-  turnWaitTime:0,
+  turnWaitTime:3000,
 }
 
 let occupiedSquares = {
@@ -375,6 +375,7 @@ let shipPlacementClickHandler = (event) => {
 function placementFinishedHandler(){
   $("#game-info-right").empty();
   createScoreBoard();
+  $(".game-log-table").removeClass("hidden-elem");
   $("#game-info-heading").text("Ready?");
   $("#game-info-text").text("Click to begin.");
   $("#game-info-container").on("click", heroTurn);
@@ -414,7 +415,19 @@ let updateSunkShipScoreboard = (shipName, isHero) => {
   let tdClassName = `.${shipName.toLowerCase()}-state`;
   let $tdStatus = $(tableClassName).find(tdClassName);
   $tdStatus.text("Sunk").removeClass(".operational-td").addClass("sunk-td");
-}
+};
+
+let updateGameLog = (data) => {
+  let logStr = `${data.coord} ${data.status}`;
+  if(data.target) logStr += " " + data.target[0].toUpperCase() + data.target.slice(1);
+  let $logEntry = $(`
+    <tr>
+      <td>${data.alias}:</td>
+      <td>${logStr}</td>
+    </tr>
+  `);
+  $(".game-log-table").append($logEntry);
+};
 
 //hardcoded player for now
 let squareClickHandler = (event) => {
@@ -462,7 +475,7 @@ let squareClickHandler = (event) => {
         displayShotGraphic($target, imgSrc);
       }
       displayShotMessage(messageHeading, message);
-
+      updateGameLog(data);
       if(data.gameOver){
         setStateGameOver(data);
       }else{
@@ -478,7 +491,6 @@ let opponentTurn = () => {
   $("#game-info-heading").text("Opponent Turn");
   $("#game-info-text").text("Your crew waits in hushed expectation.");
   $.get("/ai-fire", function(data){
-    console.log("after opponent fire", data, typeof data)
     let parsedData = JSON.parse(data);
     let message;
     let messageHeading;
@@ -498,6 +510,7 @@ let opponentTurn = () => {
         message = `Steady yourself comrade, all is not lost.`;
       }
     }
+    updateGameLog(parsedData);
     let target = $(`#hero-${parsedData.coord}`);
     displayShotGraphic(target, imgSrc);
     displayShotMessage(messageHeading, message);
@@ -524,7 +537,6 @@ $(document).ready(() => {
     let userName = $form.find(".start-game-input").val();
     let opponentName = $form.find("#opponent-input").val();
     let data = JSON.stringify({userName: userName, opponentName: opponentName});
-    console.log("data sent to server: ", data)
     event.preventDefault();
     if(userName && opponentName){
       $.ajax({
