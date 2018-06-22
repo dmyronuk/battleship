@@ -73,30 +73,31 @@ let createColumnLabels = (board) => {
   $(board).prepend(columnLabelContainer);
 };
 
-createScoreboardTable = (playerName) => {
+createScoreboardTable = (playerName, isHero) => {
+  let tableClass = isHero ? "hero-table" : "opponent-table";
   return $(
   `<div>
     <div class="scoreboard-name">${playerName}</div>
-    <table class="scoreboard-table">
+    <table class="scoreboard-table ${tableClass}">
       <tr>
         <td>Carrier:</td>
-        <td class="operational-td">Operational</td>
+        <td class="operational-td carrier-state">Operational</td>
       </tr>
       <tr>
         <td>Battleship:</td>
-        <td class="operational-td">Operational</td>
+        <td class="operational-td battleship-state">Operational</td>
       </tr>
       <tr>
         <td>Cruiser:</td>
-        <td class="operational-td">Operational</td>
+        <td class="operational-td cruiser-state">Operational</td>
       </tr>
       <tr>
         <td>Submarine:</td>
-        <td class="operational-td">Operational</td>
+        <td class="operational-td submarine-state">Operational</td>
       </tr>
       <tr>
         <td>Destroyer:</td>
-        <td class="operational-td">Operational</td>
+        <td class="operational-td destroyer-state">Operational</td>
       </tr>
     </table>
   </div>
@@ -110,8 +111,8 @@ let createScoreBoard = () => {
   let wins = container.data("wins");
   let losses = container.data("losses");
   let $heading = $(`<div class="score-wins">Wins: ${wins} Losses: ${losses}</div>`);
-  let $heroTable = createScoreboardTable(userName);
-  let $opponentTable = createScoreboardTable(opponentName);
+  let $heroTable = createScoreboardTable(userName, true);
+  let $opponentTable = createScoreboardTable(opponentName, false);
   container.append([$heading, $heroTable, $opponentTable]);
 };
 
@@ -242,6 +243,7 @@ let displayShipPlacementInfo = (ships, options) => {
     curShip.attr("orientation", 0);
     curShip.attr("length", curShipObj.length);
     curShip.on("click", shipPlacementClickHandler);
+    console.log(curShipObj.imageURL)
     container.text(curShipObj.name);
     container.prepend(curShip);
     $("#game-info-right").append(container);
@@ -398,6 +400,14 @@ let displayShotGraphic = ($target, imgSrc) =>{
   $target.append(shotImg);
 };
 
+let updateSunkShipScoreboard = (shipName, isHero) => {
+  //$( "input[value='Hot Fuzz']" )
+  let tableClassName = isHero ? ".hero-table" : ".opponent-table";
+  let tdClassName = `.${shipName.toLowerCase()}-state`;
+  let $tdStatus = $(tableClassName).find(tdClassName);
+  $tdStatus.text("Sunk").removeClass(".operational-td").addClass("sunk-td");
+}
+
 //hardcoded player for now
 let squareClickHandler = (event) => {
   event.stopPropagation();
@@ -421,18 +431,24 @@ let squareClickHandler = (event) => {
       let message;
       let messageHeading;
       if(! data.status){
-        messageHeading = "Again?"
-        message = "You already targetted that coordinate!"
+        messageHeading = "Again?";
+        message = "You already targetted that coordinate!";
       }else{
         let imgSrc;
         if(data.status === "Miss"){
           messageHeading = data.status;
-          message = "The disappointment is palpable"
+          message = "The disappointment is palpable";
           imgSrc = "/images/x.png";
         }else{
           messageHeading = `Enemy ${data.target} Hit!`;
-          message = (data.shipIsSunk) ? `You sunk the enemy's ${data.target}.` : `Excellent, more vodka comrade.`
-          imgSrc = "/images/explosion-c.png"
+          imgSrc = "/images/explosion-c.png";
+
+          if(data.shipIsSunk){
+            message = `You sunk the enemy's ${data.target}.`;
+            updateSunkShipScoreboard(data.target, false);
+          }else{
+            message = `Excellent, more vodka comrade.`;
+          }
         }
         let $target = $(event.target);
         displayShotGraphic($target, imgSrc);
@@ -465,8 +481,14 @@ let opponentTurn = () => {
     }else{
       let shipName = parsedData.target[0].toUpperCase() + parsedData.target.slice(1);
       messageHeading = `${shipName} Hit!`;
-      message = (parsedData.shipIsSunk) ? `The enemy has sunk your ${parsedData.target}.` : `Steady yourself comrade, all is not lost.`
       imgSrc = "/images/explosion-c.png"
+
+      if(parsedData.shipIsSunk){
+         message =`The enemy has sunk your ${parsedData.target}.`;
+         updateSunkShipScoreboard(parsedData.target, true);
+      }else{
+        message = `Steady yourself comrade, all is not lost.`;
+      }
     }
     let target = $(`#hero-${parsedData.coord}`);
     displayShotGraphic(target, imgSrc);

@@ -11,12 +11,13 @@ app.use(bodyParser.json());
 let db = require("./database.json");
 
 class Ship {
-  constructor(name, length) {
+  constructor(name, length, image) {
     this.name = name;
     this.length = length;
     this.hits = 0;
     this.isOperational = true;
     this.isPlaced = false;
+    this.imageURL = `/images/${name.toLowerCase()}.png`;
   }
 
   checkIfSunk(){
