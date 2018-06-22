@@ -16,7 +16,7 @@ Lighthouse Labs week 3 side project.  A browser based implementation of the clas
 
 - ```npm install```
 - ```node app.js```
-- Run on [localhost](http://127.0.0.1:8080)
+- play in browser at [localhost](http://127.0.0.1:8080)
 
 ## Bugs
 - Validation of ship placement is currently broken.  Currently allows users to place ships outside board coordinates.
