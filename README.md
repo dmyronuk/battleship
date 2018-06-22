@@ -1,4 +1,4 @@
-# Bar Chart Generator
+# Battleship
 
 ## About
 Lighthouse Labs week 3 side project.  A browser based implementation of the classic board game.
