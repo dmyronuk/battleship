@@ -9,7 +9,7 @@ Lighthouse Labs week 3 side project.  A browser based implementation of the clas
 ## Dependencies
 - NodeJS
 - ExpressJS
-- Body-Parse
+- Body-Parser
 - Jquery
 
 ## Usage
