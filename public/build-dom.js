@@ -243,6 +243,7 @@ let displayShipPlacementInfo = (ships, options) => {
     curShip.attr("id", curShipObj.name.toLowerCase());
     curShip.attr("orientation", 0);
     curShip.attr("length", curShipObj.length);
+    curShip.css("background-image", `url('${curShipObj.imageURL}')`)
     curShip.on("click", shipPlacementClickHandler);
     console.log(curShipObj.imageURL)
     container.text(curShipObj.name);
