@@ -377,9 +377,12 @@ let shipPlacementClickHandler = (event) => {
 function placementFinishedHandler(){
   $("#game-info-right").empty();
   createScoreBoard();
-  $(".game-log-table").removeClass("hidden-elem");
+  $(".game-log-toggle").removeClass("hidden-elem");
   $("#game-info-heading").text("Ready?");
   $("#game-info-text").text("Click to begin.");
+  $(".game-log-toggle").on("click", function(){
+    $(".game-log-container").toggleClass("collapsed-log");
+  });
   $("#game-info-container").on("click", heroTurn);
 }
 
