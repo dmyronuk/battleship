@@ -1,4 +1,4 @@
-# Bar Chart Generator
+# Battleship
 
 ## About
 Lighthouse Labs week 3 side project.  A browser based implementation of the classic board game.
@@ -9,14 +9,14 @@ Lighthouse Labs week 3 side project.  A browser based implementation of the clas
 ## Dependencies
 - NodeJS
 - ExpressJS
-- Body-Parse
+- Body-Parser
 - Jquery
 
 ## Usage
 
 - ```npm install```
 - ```node app.js```
-- Run on [localhost](http://127.0.0.1:8080)
+- play in browser at [localhost](http://127.0.0.1:8080)
 
 ## Bugs
 - Validation of ship placement is currently broken.  Currently allows users to place ships outside board coordinates.
