@@ -197,6 +197,7 @@
 }
 
 .game-log-table{
+  background:#eeeeee;
   border:1px solid black;
   width:250px;
   margin-top:52px;
@@ -205,6 +206,10 @@
 
 .collapsed-log{
   width:0px;
+}
+
+.rotated-ship{
+  transform: rotate(90deg);
 }
 
 .hidden-elem{
