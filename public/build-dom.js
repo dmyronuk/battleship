@@ -269,6 +269,7 @@ let shipRotateHandler = (event) => {
     let height = ship.height();
     ship.width(height);
     ship.height(width);
+
     //update orientation variable
     let newOrientation = (ship.attr("orientation") + 1) % 2;
     ship.attr("orientation", newOrientation);
