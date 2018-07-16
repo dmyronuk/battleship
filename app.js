@@ -45,20 +45,15 @@ class Player {
   constructor(num){
     this.playerId = num;
     this.board = {}
-    this.ships = this.initShips();
-    this.alias = null;
-  }
-
-  initShips(){
-    let ships = {}
-    for(let i = 1; i < 3; i++){
-      ships.carrier = new Ship("Carrier", 5);
-      ships.battleship = new Ship("Battleship", 4);
-      ships.cruiser = new Ship("Cruiser", 3);
-      ships.submarine = new Ship("Submarine", 3);
-      ships.destroyer = new Ship("Destroyer", 2);
+    this.ships = {
+      carrier: new Ship("Carrier", 5),
+      battleship: new Ship("Battleship", 4),
+      cruiser: new Ship("Cruiser", 3),
+      submarine: new Ship("Submarine", 3),
+      destroyer: new Ship("Destroyer", 2),
     }
-    return ships;
+
+    this.alias = null;
   }
 
   allShipsPlaced(){

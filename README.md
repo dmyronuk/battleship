@@ -3,8 +3,8 @@
 ## About
 Lighthouse Labs week 3 side project.  A browser based implementation of the classic board game.
 
-## Screenshots
-![Sample Gameplay](https://raw.githubusercontent.com/dmyronuk/battleship/master/screenshots/battleship.png)
+## Demo
+![Sample Gameplay](https://raw.githubusercontent.com/dmyronuk/battleship/master/screenshots/demo.gif)
 
 ## Dependencies
 - NodeJS
@@ -19,7 +19,7 @@ Lighthouse Labs week 3 side project.  A browser based implementation of the clas
 - play in browser at [localhost](http://127.0.0.1:8080)
 
 ## Bugs
-- Validation of ship placement is currently broken.  Currently allows users to place ships outside board coordinates.
+- Validation of ship placement is currently broken.  Currently allows users to place ships outside board coordinates. Also some strange behavior with ship rotation.
 
 ## Roadmap
 - Bugfixes & refactoring
