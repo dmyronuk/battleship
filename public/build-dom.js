@@ -491,41 +491,48 @@ let squareClickHandler = (event) => {
 }
 
 let opponentTurn = () => {
+
   $("#game-info-heading").text("Opponent Turn");
   $("#game-info-text").text("Your crew waits in hushed expectation.");
-  $.get("/ai-fire", function(data){
-    let parsedData = JSON.parse(data);
-    let message;
-    let messageHeading;
-    if(parsedData.status === "Miss"){
-      messageHeading = parsedData.status;
-      message = "The enemy missed. You breathe a sigh of relief.";
-      imgSrc = "/images/x.png";
-    }else{
-      let shipName = parsedData.target[0].toUpperCase() + parsedData.target.slice(1);
-      messageHeading = `${shipName} Hit!`;
-      imgSrc = "/images/explosion-c.png";
-
-      if(parsedData.shipIsSunk){
-         message =`The enemy has sunk your ${parsedData.target}.`;
-         updateSunkShipScoreboard(parsedData.target, true);
+  //Set timeout so user can read opponent turn message
+  setTimeout(() => {
+    $.get("/ai-fire", function(data){
+      let parsedData = JSON.parse(data);
+      let message;
+      let messageHeading;
+      if(parsedData.status === "Miss"){
+        messageHeading = parsedData.status;
+        message = "The enemy missed. You breathe a sigh of relief.";
+        imgSrc = "/images/x.png";
       }else{
-        message = `Steady yourself comrade, all is not lost.`;
-      }
-    }
-    updateGameLog(parsedData);
-    let target = $(`#hero-${parsedData.coord}`);
-    displayShotGraphic(target, imgSrc);
-    displayShotMessage(messageHeading, message);
+        let shipName = parsedData.target[0].toUpperCase() + parsedData.target.slice(1);
+        messageHeading = `${shipName} Hit!`;
+        imgSrc = "/images/explosion-c.png";
 
-    if(parsedData.gameOver){
-      setStateGameOver();
-    }else{
-      setTimeout(() => {
-        heroTurn();
-      }, options.turnWaitTime)
-    }
-  })
+        if(parsedData.shipIsSunk){
+           message =`The enemy has sunk your ${parsedData.target}.`;
+           updateSunkShipScoreboard(parsedData.target, true);
+        }else{
+          message = `Steady yourself comrade, all is not lost.`;
+        }
+      }
+      updateGameLog(parsedData);
+      let target = $(`#hero-${parsedData.coord}`);
+      displayShotGraphic(target, imgSrc);
+      displayShotMessage(messageHeading, message);
+
+      //set timeout so that user can read turn result message
+      setTimeout(() =>{
+        if(parsedData.gameOver){
+          setStateGameOver();
+        }else{
+          setTimeout(() => {
+            heroTurn();
+          }, options.turnWaitTime)
+        }
+      })
+    })
+  }, 2000)
 }
 
 createBoards(options, ["hero-board-container", "opponent-board-container"]);

@@ -213,25 +213,23 @@ app.post("/client-fire", (req, res) => {
 });
 
 app.get("/ai-fire", (req, res) => {
-  setTimeout(() => {
-    let cpuPlayer = curGame.players.p2;
-    let coords;
+  let cpuPlayer = curGame.players.p2;
+  let coords;
 
-    while(! coords){
-      let testCoords = cpuPlayer.generateRandomCoords();
-      let squareState = curGame.players.p1.board[testCoords];
-      // SquareState is undefined for empty square that haven't been hit so this catches a miss;
-      if(! squareState){
-        coords = testCoords;
-      }else if(squareState.name && squareState.hit === false ){
-        coords = testCoords;
-      }
+  while(! coords){
+    let testCoords = cpuPlayer.generateRandomCoords();
+    let squareState = curGame.players.p1.board[testCoords];
+    // SquareState is undefined for empty square that haven't been hit so this catches a miss;
+    if(! squareState){
+      coords = testCoords;
+    }else if(squareState.name && squareState.hit === false ){
+      coords = testCoords;
     }
+  }
 
-    let outData = curGame.playerTurn("p2", "p1", coords);
-    let outJSON = JSON.stringify(outData);
-    res.send(outJSON);
-  }, 2000)
+  let outData = curGame.playerTurn("p2", "p1", coords);
+  let outJSON = JSON.stringify(outData);
+  res.send(outJSON);
 })
 
 app.listen(PORT, () => {
