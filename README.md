@@ -1,7 +1,7 @@
 # Battleship
 
 ## About
-Lighthouse Labs week 3 side project.  A browser based implementation of the classic board game.
+Lighthouse Labs week 3 side project.  A browser based implementation of the classic board game.  Compete against a computer opponent for mastery of the high seas.
 
 ## Demo
 ![Sample Gameplay](https://raw.githubusercontent.com/dmyronuk/battleship/master/screenshots/demo.gif)
@@ -10,19 +10,14 @@ Lighthouse Labs week 3 side project.  A browser based implementation of the clas
 - NodeJS
 - ExpressJS
 - Body-Parser
-- Jquery
+- jQuery
 
 ## Usage
-
-- ```npm install```
-- ```node app.js```
-- play in browser at [localhost](http://127.0.0.1:8080)
-
-## Bugs
-- Validation of ship placement is currently broken.  Currently allows users to place ships outside board coordinates. Also some strange behavior with ship rotation.
+- Install dependencies: ```npm install```
+- Start the server: ```node app.js```
+- Play in-browser at [localhost](http://127.0.0.1:8080)
 
 ## Roadmap
-- Bugfixes & refactoring
 - Add ship icons and proper css styles
 - Add hit and miss animations
 

@@ -156,11 +156,22 @@
 }
 
 .ship{
+  border:1px solid black;
+  background:radial-gradient(#202326, #3e363b);
+  position:relative;
   margin:auto;
-  border: solid 1px black;
-  background:red;
+  background-size:100% 100%;
   margin-bottom:5px;
   z-index:100;
+  object-fit: fill;
+}
+
+.ship img{
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  left: 0px;
+  pointer-events: none;
 }
 
 .board-img{
@@ -210,4 +221,7 @@
 
 .hidden-elem{
   display:none;
+}
+
+.rotated{
 }

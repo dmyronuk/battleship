@@ -11,15 +11,6 @@ let occupiedSquares = {
   opponent:[],
 };
 
-let isInArray = (arr, elem) => {
-  return arr.reduce((acc, cur) => {
-    if(cur === elem){
-      acc = true;
-    }
-    return acc;
-  }, false)
-}
-
 //both args are jquery objects - both column letter and row number are parsed as integers
 let getCoordsFromSquare = (squareObj) => {
   let coordsStr = squareObj.attr("id").split("-")[1];
@@ -168,9 +159,10 @@ let getShipCoordsFromStartPos = (args) => {
 //args: ship, owner, orientation, row, col
 //returns the ships coordinates
 let shipInValidPosition = (args) => {
-  let maxRow = "J".charCodeAt() - args.ship.length + 1;
-  let maxCol = 10 - args.ship.length + 1;
+  let maxRow = "J".charCodeAt() - args.length + 1;
+  let maxCol = 10 - args.length + 1;
   //vertically placed ship is outside of board
+
   if(args.orientation == 0 && args.row > maxRow){
     return null;
   //horizontally placed ship is outside of board
@@ -180,7 +172,7 @@ let shipInValidPosition = (args) => {
     let shipCoords = getShipCoordsFromStartPos(args);
     //test if any squares are already occupied and returns null if yes
     return shipCoords.reduce((acc, cur) => {
-      if(isInArray(occupiedSquares[args.owner], cur)){
+      if(occupiedSquares[args.owner].indexOf(cur) >=0 ){
         acc = null;
       }
       return acc;
@@ -235,9 +227,12 @@ let displayShipPlacementInfo = (ships, options) => {
   $("#game-info-right").css("align-items", "flex-end");
 
   Object.keys(ships).forEach((shipKey) => {
-    let curShip = $("<div/>").addClass("ship");
-    let container = $("<div/>").addClass("ship-selection-container")
     let curShipObj = ships[shipKey];
+    let curShip = $(`
+      <div class="ship">
+      <div>
+    `);
+    let container = $("<div/>").addClass("ship-selection-container")
     let length = curShipObj.length * options.squareHeight - 7;
     let width = options.squareWidth - 7;
     curShip.height(length);
@@ -245,6 +240,7 @@ let displayShipPlacementInfo = (ships, options) => {
     curShip.attr("id", curShipObj.name.toLowerCase());
     curShip.attr("orientation", 0);
     curShip.attr("length", curShipObj.length);
+    // curShip.css("background-image", `url('${curShipObj.imageURL}')`)
     curShip.on("click", shipPlacementClickHandler);
     container.text(curShipObj.name);
     container.prepend(curShip);
@@ -268,8 +264,10 @@ let shipRotateHandler = (event) => {
     let height = ship.height();
     ship.width(height);
     ship.height(width);
+
     //update orientation variable
-    let newOrientation = (ship.attr("orientation") + 1) % 2;
+    const prevOrientation = parseInt(ship.attr("orientation"));
+    const newOrientation = (prevOrientation + 1) % 2;
     ship.attr("orientation", newOrientation);
   }
 }
@@ -309,7 +307,7 @@ let shipSetPlaceHandler = (event) => {
     let squareCoords = getCoordsFromSquare(target);
     let shipValidationArgs = {
       ship: ship,
-      length:ship.attr("length"),
+      length: parseInt(ship.attr("length")),
       owner: "hero",
       orientation: ship.attr("orientation"),
       row: squareCoords.row,
